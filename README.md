@@ -33,4 +33,4 @@ To use the project, simply open the HTML file in a web browser. You can drag and
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the Apache 2.0 License - see the [LICENSE](LICENSE) file for details.
