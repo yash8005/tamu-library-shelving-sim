@@ -1,0 +1,144 @@
+body {
+  background: radial-gradient(circle at -8.9% 51.2%, rgb(85, 0, 0) 0%, rgb(85, 0, 0) 15.9%, rgb(115, 58, 50) 15.9%, rgb(115, 58, 50) 24.4%, rgb(19, 30, 37) 24.5%, rgb(19, 30, 37) 66%);
+  font-family: "Benton Sans", "Helvetica Neue", helvetica, arial, sans-serif;
+  margin-top: 1em;
+  margin-bottom: 0;
+  margin-right: 0;
+}
+
+#header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+#description {
+  display: flex;
+  width: 25%;
+  background-color: #ffffff;
+  padding: 10px;
+  text-align: center;
+  font-style: italic;
+  color: #000000;
+  border-radius: 5px;
+  font-size: 24;
+  margin: 15px;
+  align-items: center;
+  justify-content: center;
+}
+
+.container {
+  display: flex;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+}
+
+.box {
+  border: 1px solid #FFFFFF;
+  background-color: #ddd;
+  border-radius: .1em;
+  cursor: move;
+}
+
+.box.over {
+  border: 1px dotted #666;
+}
+
+.wrap {
+  display: flex;
+  width: 80%;
+  align-items: center;
+  align-self: center;
+  justify-content: center;
+}
+
+.buttonSubmit {
+  display: flex;
+  outline: none;
+  cursor: pointer;
+  font-weight: 600;
+  border-radius: 3px;
+  padding: 12px 24px;
+  margin: 25px;
+  width: 160px;
+  height: 37.5px;
+  border: 0;
+  color: #ffffff;
+  background: rgb(115, 58, 50);
+  line-height: 1.15;
+  font-size: 16px;
+  justify-content: center;
+  align-items: center;
+  align-self: center;
+
+  :hover {
+    transition: all .1s ease;
+    box-shadow: 0 0 0 0 #fff, 0 0 0 3px rgb(115, 58, 50);
+  }
+}
+
+.buttonReset {
+
+  display: flex;
+  outline: none;
+  cursor: pointer;
+  font-weight: 600;
+  border-radius: 3px;
+  padding: 12px 24px;
+  margin: 25px;
+  width: 140px;
+  height: 37.5px;
+  border: 0;
+  color: #3a4149;
+  background: #ffffff;
+  line-height: 1.15;
+  font-size: 16px;
+  justify-content: center;
+  align-items: center;
+  align-self: center;
+
+  :hover {
+    transition: all .1s ease;
+    box-shadow: 0 0 0 0 #ffffff, 0 0 0 3px #1de9b6;
+  }
+
+}
+
+#result {
+  display: flex;
+  padding: 10px;
+  text-align: center;
+  font-style: italic;
+  color: #000000;
+  border-radius: 5px;
+  width: 120px;
+  height: 20px;
+  font-size: 24;
+  margin: 25px;
+  justify-content: center;
+  align-items: center;
+  align-self: center;
+}
+
+footer {
+  display: flex;
+  align-items: center;
+  align-self: center;
+  justify-content: center;
+  background-color: rgb(115, 58, 50);
+  color: white;
+  margin-top: 15px;
+  height: 20px;
+  font-size: 10pt;
+}
+
+[draggable] {
+  user-select: none;
+}
