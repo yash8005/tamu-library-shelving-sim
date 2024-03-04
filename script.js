@@ -1,62 +1,61 @@
+// Function to handle the start of a drag operation
+var dragSrcEl = null;
+function handleDragStart(e) {
+  dragSrcEl = this;
+
+  // Set data to be transferred during drag
+  e.dataTransfer.effectAllowed = "move";
+  e.dataTransfer.setData("text/html", this.innerHTML);
+}
+
+// Function to handle dragging over a target
+function handleDragOver(e) {
+  // Prevent default behavior
+  if (e.preventDefault) {
+    e.preventDefault();
+  }
+  e.dataTransfer.dropEffect = "move";
+
+  return false;
+}
+
+// Function to handle when an element is dragged into a target
+function handleDragEnter(e) {
+  this.classList.add("over");
+}
+
+// Function to handle when an element is dragged out of a target
+function handleDragLeave(e) {
+  this.classList.remove("over");
+}
+
+// Function to handle dropping an element into a target
+function handleDrop(e) {
+  if (e.stopPropagation) {
+    e.stopPropagation(); // Prevents the browser from redirecting.
+  }
+
+  // Swap HTML content between source and target elements
+  if (dragSrcEl != this) {
+    dragSrcEl.innerHTML = this.innerHTML;
+    this.innerHTML = e.dataTransfer.getData("text/html");
+  }
+
+  return false;
+}
+
+// Function to handle the end of a drag operation
+function handleDragEnd(e) {
+  this.style.opacity = "1";
+
+  // Remove 'over' class from all items
+  items.forEach(function (item) {
+    item.classList.remove("over");
+  });
+}
+
 // Execute when the DOM content is loaded
 document.addEventListener("DOMContentLoaded", (event) => {
-  var dragSrcEl = null;
-
-  // Function to handle the start of a drag operation
-  function handleDragStart(e) {
-    dragSrcEl = this;
-
-    // Set data to be transferred during drag
-    e.dataTransfer.effectAllowed = "move";
-    e.dataTransfer.setData("text/html", this.innerHTML);
-  }
-
-  // Function to handle dragging over a target
-  function handleDragOver(e) {
-    // Prevent default behavior
-    if (e.preventDefault) {
-      e.preventDefault();
-    }
-    e.dataTransfer.dropEffect = "move";
-
-    return false;
-  }
-
-  // Function to handle when an element is dragged into a target
-  function handleDragEnter(e) {
-    this.classList.add("over");
-  }
-
-  // Function to handle when an element is dragged out of a target
-  function handleDragLeave(e) {
-    this.classList.remove("over");
-  }
-
-  // Function to handle dropping an element into a target
-  function handleDrop(e) {
-    if (e.stopPropagation) {
-      e.stopPropagation(); // Prevents the browser from redirecting.
-    }
-
-    // Swap HTML content between source and target elements
-    if (dragSrcEl != this) {
-      dragSrcEl.innerHTML = this.innerHTML;
-      this.innerHTML = e.dataTransfer.getData("text/html");
-    }
-
-    return false;
-  }
-
-  // Function to handle the end of a drag operation
-  function handleDragEnd(e) {
-    this.style.opacity = "1";
-
-    // Remove 'over' class from all items
-    items.forEach(function (item) {
-      item.classList.remove("over");
-    });
-  }
-
   // Select all elements with class 'box' inside '.container' and attach drag and drop event listeners
   let items = document.querySelectorAll(".container .box");
   items.forEach(function (item) {
@@ -72,6 +71,20 @@ document.addEventListener("DOMContentLoaded", (event) => {
 // Execute when the document is ready
 $(document).ready(function () {
   console.log("Document ready");
+
+  // Create a map to store directory and number of images
+  const directoryImagesMap = new Map();
+
+  // Populate the map with directory and corresponding number of images
+  directoryImagesMap.set("1", 3);
+  directoryImagesMap.set("2", 3);
+  directoryImagesMap.set("3", 3);
+  directoryImagesMap.set("4", 7);
+  directoryImagesMap.set("5", 5);
+  directoryImagesMap.set("6", 7);
+  directoryImagesMap.set("7", 5);
+  directoryImagesMap.set("8", 7);
+  directoryImagesMap.set("9", 6);
 
   // Function to handle click on submit button
   $(".buttonSubmit").click(function () {
@@ -113,25 +126,63 @@ $(document).ready(function () {
     }
 
     var path = "/Books/Sets"; // Path to the directory containing images
-    var totalDirectories = 3; // Total number of directories
+    var totalDirectories = directoryImagesMap.size; // Total number of directories
 
     // Randomly select a directory
     var randomDirectory = getRandomInt(1, totalDirectories);
 
-    // Array to keep track of selected image numbers
-    var selectedImages = [];
+    var numberOfImages = directoryImagesMap.get(String(randomDirectory));
 
-    // Display images from the selected directory on the book divs in random order
-    $(".box").each(function () {
-      var imgId;
-      // Ensure each image is unique
-      do {
-        imgId = getRandomInt(1, 3); // Assuming there are 3 images in each directory
-      } while (selectedImages.includes(imgId));
+    // Update the grid-template-columns property of the .container class using jQuery
+    $(".container").css(
+      "grid-template-columns",
+      `repeat(${numberOfImages}, 1fr)`,
+    );
 
-      selectedImages.push(imgId);
-      var newSrc = path + "/" + randomDirectory + "/" + imgId + ".PNG";
-      $(this).find("img").attr("src", newSrc).attr("id", imgId);
-    });
+    // Remove existing box divs
+    $(".box").remove();
+
+    // Generate an array containing IDs of all images in the selected directory
+    var imageIds = [];
+    for (var i = 1; i <= numberOfImages; i++) {
+      imageIds.push(i);
+    }
+
+    // Shuffle the array to randomize the order of image IDs
+    for (var i = imageIds.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var temp = imageIds[i];
+      imageIds[i] = imageIds[j];
+      imageIds[j] = temp;
+    }
+
+    // Create new box divs and assign each image ID in the shuffled order
+    for (var i = 0; i < numberOfImages; i++) {
+      // Create new box divs and assign each image ID in the shuffled order
+      var newDiv = document.createElement("div");
+      newDiv.setAttribute("draggable", true);
+      newDiv.classList.add("box");
+      newDiv.setAttribute("id", "book-" + (i + 1));
+
+      var newImg = document.createElement("img");
+      newImg.setAttribute(
+        "src",
+        `${path}/${randomDirectory}/${imageIds[i]}.PNG`,
+      );
+      newImg.setAttribute("id", imageIds[i]);
+      newImg.setAttribute("width", "120");
+      newImg.setAttribute("height", "550");
+
+      newDiv.appendChild(newImg);
+      $(".container").append(newDiv);
+
+      // Attach event listeners for drag and drop operations to the new elements
+      newDiv.addEventListener("dragstart", handleDragStart);
+      newDiv.addEventListener("dragenter", handleDragEnter);
+      newDiv.addEventListener("dragover", handleDragOver);
+      newDiv.addEventListener("dragleave", handleDragLeave);
+      newDiv.addEventListener("drop", handleDrop);
+      newDiv.addEventListener("dragend", handleDragEnd);
+    }
   });
 });
