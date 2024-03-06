@@ -66,12 +66,18 @@ document.addEventListener("DOMContentLoaded", (event) => {
     item.addEventListener("drop", handleDrop, false);
     item.addEventListener("dragend", handleDragEnd, false);
   });
+
+  // Initially disable the Next Puzzle button
+  $(".buttonReset").prop("disabled", true);
 });
+
+// Flag to keep track of whether the current puzzle is solved
+var isPuzzleSolved = false;
 
 // Execute when the document is ready
 $(document).ready(function () {
   console.log("Document ready");
-
+  $(".buttonRest").prop("disabled", true);
   // Create a map to store directory and number of images
   const directoryImagesMap = new Map();
 
@@ -110,6 +116,8 @@ $(document).ready(function () {
     // Display result based on the order of IDs
     if (isAscending) {
       $(result).text("Correct Answer").css("background-color", "#c7efcf");
+      isPuzzleSolved = true; // Puzzle is solved
+      $(".buttonReset").prop("disabled", false); // Enable the Next Puzzle button
     } else {
       $(result).text("Incorrect Answer").css("background-color", "#fe5f55");
     }
@@ -184,5 +192,7 @@ $(document).ready(function () {
       newDiv.addEventListener("drop", handleDrop);
       newDiv.addEventListener("dragend", handleDragEnd);
     }
+    // Initially disable the Next Puzzle button
+    $(".buttonReset").prop("disabled", true);
   });
 });

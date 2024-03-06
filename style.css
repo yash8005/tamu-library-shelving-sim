@@ -104,6 +104,11 @@ body {
   align-items: center;
   align-self: center;
 
+  &:disabled {
+    opacity: 0.6; /* Reduce opacity for disabled state */
+    cursor: not-allowed; /* Change cursor to not-allowed */
+  }
+  
   :hover {
     transition: all .1s ease;
     box-shadow: 0 0 0 0 #ffffff, 0 0 0 3px #1de9b6;
