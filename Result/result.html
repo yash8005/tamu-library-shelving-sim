@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="result.css" />
+    <script type="module" src="result.js"></script>
+  </head>
+  <body>
+    <main class="container">
+      <div class="dashboard">
+        <h1 class="dashboard__header">Your Result</h1>
+        <div class="dashboard__score">
+          <h2 id="score-number" class="score-number" data-target="100b">0</h2>
+          <p class="score-text">of 100</p>
+        </div>
+      </div>
+      <div class="summary">
+        <h1 class="summary__header">Summary</h1>
+        <div id="summary__category">
+          <div>
+            <div
+              class="categoryicon"
+              style="
+                background-color: var(--lightRedBackground);
+                color: var(--lightRed);
+              "
+            >
+              <img src="./Images/icon-reaction.svg" alt="Reaction" />
+              <div class="text-block">
+                <h2 class="category-text">Accuracy</h2>
+              </div>
+              <div class="score">
+                <h2 id="accuracy"></h2>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div
+              class="categoryicon"
+              style="
+                background-color: var(--orangeYellowBackground);
+                color: var(--orangeYellow);
+              "
+            >
+              <img src="./Images/icon-memory.svg" alt="Memory" />
+              <div class="text-block">
+                <h2 class="category-text">Multiple Attempts</h2>
+              </div>
+              <div class="score">
+                <h2 id="multiple-attempts"></h2>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div
+              class="categoryicon"
+              style="
+                background-color: var(--greenTealBackground);
+                color: var(--greenTeal);
+              "
+            >
+              <img src="./Images/icon-verbal.svg" alt="Verbal" />
+              <div class="text-block">
+                <h2 class="category-text">Longest Streak</h2>
+              </div>
+              <div class="score">
+                <h2 id="longest-streak"></h2>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div
+              class="categoryicon"
+              style="
+                background-color: var(--cobaltBlueBackground);
+                color: var(--cobaltBlue);
+              "
+            >
+              <img src="./Images/icon-visual.svg" alt="Visual" />
+              <div class="text-block">
+                <h2 class="category-text">Max Attempts / Puzzle</h2>
+              </div>
+              <div class="score">
+                <h2 id="max-attempts"></h2>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="PlayAgain" type="button">Play Again</button>
+      </div>
+    </main>
+  </body>
+</html>

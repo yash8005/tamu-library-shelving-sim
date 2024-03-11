@@ -70,9 +70,23 @@ document.addEventListener("DOMContentLoaded", (event) => {
   // Initially disable the Next Puzzle button
   $(".buttonReset").prop("disabled", true);
 });
+// Count of correctly solved puzzles on the first attempt
+var correctPuzzlesCount = 0;
+// Set of directory indices solved correctly on the first attempt
+var solvedDirectoryIndices = new Set();
+// Attempt count for the current puzzle
+var attemptCount = 0;
+// Randomly select a directory
+var randomDirectory;
 
-// Flag to keep track of whether the current puzzle is solved
-var isPuzzleSolved = false;
+// Longest streak of puzzles solved correctly on the first attempt
+var longestStreak = 0;
+// Current streak of puzzles solved correctly on the first attempt
+var currentStreak = 0;
+// Maximum attempts required to solve a puzzle
+var maxAttempts = 0;
+// Number of puzzles that required multiple attempts
+var multipleAttemptsCount = 0;
 
 // Execute when the document is ready
 $(document).ready(function () {
@@ -116,10 +130,39 @@ $(document).ready(function () {
     // Display result based on the order of IDs
     if (isAscending) {
       $(result).text("Correct Answer").css("background-color", "#c7efcf");
-      isPuzzleSolved = true; // Puzzle is solved
-      $(".buttonReset").prop("disabled", false); // Enable the Next Puzzle button
+      if (attemptCount === 0) {
+        correctPuzzlesCount++;
+        solvedDirectoryIndices.add(randomDirectory);
+        currentStreak++;
+        longestStreak = Math.max(longestStreak, currentStreak);
+      } else {
+        currentStreak = 0;
+        multipleAttemptsCount++;
+      }
+      maxAttempts = Math.max(maxAttempts, attemptCount + 1);
+
+      var progress =
+        (solvedDirectoryIndices.size / directoryImagesMap.size) * 100;
+      $(".progress-bar-fill").css("width", progress + "%");
+      $(".buttonReset").prop("disabled", false);
+      $(".buttonSubmit").prop("disabled", true);
+      attemptCount = 0;
+
+      // Check if all directories have been solved correctly on the first attempt
+      if (solvedDirectoryIndices.size === directoryImagesMap.size) {
+        // Store the metrics in localStorage
+        localStorage.setItem("correctPuzzlesCount", correctPuzzlesCount);
+        localStorage.setItem("multipleAttemptsCount", multipleAttemptsCount);
+        localStorage.setItem("longestStreak", longestStreak);
+        localStorage.setItem("maxAttempts", maxAttempts);
+
+        // Redirect to the results page
+        window.location.href = "Result/result.html";
+      }
     } else {
       $(result).text("Incorrect Answer").css("background-color", "#fe5f55");
+      attemptCount++;
+      currentStreak = 0;
     }
   });
 
@@ -136,8 +179,17 @@ $(document).ready(function () {
     var path = "/Books/Sets"; // Path to the directory containing images
     var totalDirectories = directoryImagesMap.size; // Total number of directories
 
-    // Randomly select a directory
-    var randomDirectory = getRandomInt(1, totalDirectories);
+    do {
+      randomDirectory = getRandomInt(1, totalDirectories);
+    } while (
+      solvedDirectoryIndices.has(randomDirectory) &&
+      solvedDirectoryIndices.size < totalDirectories
+    );
+
+    // If all directories have been solved correctly on the first attempt, reset the solvedDirectoryIndices set
+    if (solvedDirectoryIndices.size === totalDirectories) {
+      solvedDirectoryIndices.clear();
+    }
 
     var numberOfImages = directoryImagesMap.get(String(randomDirectory));
 
@@ -194,5 +246,8 @@ $(document).ready(function () {
     }
     // Initially disable the Next Puzzle button
     $(".buttonReset").prop("disabled", true);
+    $(".buttonSubmit").prop("disabled", false);
   });
 });
+
+const bar = document.querySelector(".bar");
