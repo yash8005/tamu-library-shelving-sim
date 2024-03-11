@@ -88,6 +88,11 @@ var maxAttempts = 0;
 // Number of puzzles that required multiple attempts
 var multipleAttemptsCount = 0;
 
+// Number of Incorrect Attempts
+var totalIncorrectAttemptsCount = 0;
+
+var progress;
+
 // Execute when the document is ready
 $(document).ready(function () {
   console.log("Document ready");
@@ -141,9 +146,7 @@ $(document).ready(function () {
       }
       maxAttempts = Math.max(maxAttempts, attemptCount + 1);
 
-      var progress =
-        (solvedDirectoryIndices.size / directoryImagesMap.size) * 100;
-      $(".progress-bar-fill").css("width", progress + "%");
+      progress = (solvedDirectoryIndices.size / directoryImagesMap.size) * 100;
       $(".buttonReset").prop("disabled", false);
       $(".buttonSubmit").prop("disabled", true);
       attemptCount = 0;
@@ -155,6 +158,7 @@ $(document).ready(function () {
         localStorage.setItem("multipleAttemptsCount", multipleAttemptsCount);
         localStorage.setItem("longestStreak", longestStreak);
         localStorage.setItem("maxAttempts", maxAttempts);
+        localStorage.setItem("totalIncorrectAttempts",totalIncorrectAttemptsCount);
 
         // Redirect to the results page
         window.location.href = "Result/result.html";
@@ -162,92 +166,102 @@ $(document).ready(function () {
     } else {
       $(result).text("Incorrect Answer").css("background-color", "#fe5f55");
       attemptCount++;
+      totalIncorrectAttemptsCount++;
       currentStreak = 0;
     }
   });
 
-  // Function to handle click on reset button
-  $(".buttonReset").click(function () {
-    // Hide the result div
-    $(result).text("").css("background-color", "transparent");
+ // Function to reset and load images
+ function resetAndLoadImages() {
+  // Hide the result div
+  $(result).text("").css("background-color", "transparent");
 
-    // Function to get a random integer between min and max (inclusive)
-    function getRandomInt(min, max) {
-      return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
+  $(".progress-bar-fill").css("width", progress + "%");
 
-    var path = "/Books/Sets"; // Path to the directory containing images
-    var totalDirectories = directoryImagesMap.size; // Total number of directories
+  // Function to get a random integer between min and max (inclusive)
+  function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
 
-    do {
-      randomDirectory = getRandomInt(1, totalDirectories);
-    } while (
-      solvedDirectoryIndices.has(randomDirectory) &&
-      solvedDirectoryIndices.size < totalDirectories
-    );
+  var path = "/Books/Sets"; // Path to the directory containing images
+  var totalDirectories = directoryImagesMap.size; // Total number of directories
 
-    // If all directories have been solved correctly on the first attempt, reset the solvedDirectoryIndices set
-    if (solvedDirectoryIndices.size === totalDirectories) {
-      solvedDirectoryIndices.clear();
-    }
+  do {
+    randomDirectory = getRandomInt(1, totalDirectories);
+  } while (
+    solvedDirectoryIndices.has(randomDirectory) &&
+    solvedDirectoryIndices.size < totalDirectories
+  );
 
-    var numberOfImages = directoryImagesMap.get(String(randomDirectory));
+  // If all directories have been solved correctly on the first attempt, reset the solvedDirectoryIndices set
+  if (solvedDirectoryIndices.size === totalDirectories) {
+    solvedDirectoryIndices.clear();
+  }
 
-    // Update the grid-template-columns property of the .container class using jQuery
-    $(".container").css(
-      "grid-template-columns",
-      `repeat(${numberOfImages}, 1fr)`,
-    );
+  var numberOfImages = directoryImagesMap.get(String(randomDirectory));
 
-    // Remove existing box divs
-    $(".box").remove();
+  // Update the grid-template-columns property of the .container class using jQuery
+  $(".container").css(
+    "grid-template-columns",
+    `repeat(${numberOfImages}, 1fr)`,
+  );
 
-    // Generate an array containing IDs of all images in the selected directory
-    var imageIds = [];
-    for (var i = 1; i <= numberOfImages; i++) {
-      imageIds.push(i);
-    }
+  // Remove existing box divs
+  $(".box").remove();
 
-    // Shuffle the array to randomize the order of image IDs
-    for (var i = imageIds.length - 1; i > 0; i--) {
-      var j = Math.floor(Math.random() * (i + 1));
-      var temp = imageIds[i];
-      imageIds[i] = imageIds[j];
-      imageIds[j] = temp;
-    }
+  // Generate an array containing IDs of all images in the selected directory
+  var imageIds = [];
+  for (var i = 1; i <= numberOfImages; i++) {
+    imageIds.push(i);
+  }
 
+  // Shuffle the array to randomize the order of image IDs
+  for (var i = imageIds.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var temp = imageIds[i];
+    imageIds[i] = imageIds[j];
+    imageIds[j] = temp;
+  }
+
+  // Create new box divs and assign each image ID in the shuffled order
+  for (var i = 0; i < numberOfImages; i++) {
     // Create new box divs and assign each image ID in the shuffled order
-    for (var i = 0; i < numberOfImages; i++) {
-      // Create new box divs and assign each image ID in the shuffled order
-      var newDiv = document.createElement("div");
-      newDiv.setAttribute("draggable", true);
-      newDiv.classList.add("box");
-      newDiv.setAttribute("id", "book-" + (i + 1));
+    var newDiv = document.createElement("div");
+    newDiv.setAttribute("draggable", true);
+    newDiv.classList.add("box");
+    newDiv.setAttribute("id", "book-" + (i + 1));
 
-      var newImg = document.createElement("img");
-      newImg.setAttribute(
-        "src",
-        `${path}/${randomDirectory}/${imageIds[i]}.PNG`,
-      );
-      newImg.setAttribute("id", imageIds[i]);
-      newImg.setAttribute("width", "120");
-      newImg.setAttribute("height", "550");
+    var newImg = document.createElement("img");
+    newImg.setAttribute(
+      "src",
+      `${path}/${randomDirectory}/${imageIds[i]}.PNG`,
+    );
+    newImg.setAttribute("id", imageIds[i]);
+    newImg.setAttribute("width", "120");
+    newImg.setAttribute("height", "550");
 
-      newDiv.appendChild(newImg);
-      $(".container").append(newDiv);
+    newDiv.appendChild(newImg);
+    $(".container").append(newDiv);
 
-      // Attach event listeners for drag and drop operations to the new elements
-      newDiv.addEventListener("dragstart", handleDragStart);
-      newDiv.addEventListener("dragenter", handleDragEnter);
-      newDiv.addEventListener("dragover", handleDragOver);
-      newDiv.addEventListener("dragleave", handleDragLeave);
-      newDiv.addEventListener("drop", handleDrop);
-      newDiv.addEventListener("dragend", handleDragEnd);
-    }
-    // Initially disable the Next Puzzle button
-    $(".buttonReset").prop("disabled", true);
-    $(".buttonSubmit").prop("disabled", false);
-  });
+    // Attach event listeners for drag and drop operations to the new elements
+    newDiv.addEventListener("dragstart", handleDragStart);
+    newDiv.addEventListener("dragenter", handleDragEnter);
+    newDiv.addEventListener("dragover", handleDragOver);
+    newDiv.addEventListener("dragleave", handleDragLeave);
+    newDiv.addEventListener("drop", handleDrop);
+    newDiv.addEventListener("dragend", handleDragEnd);
+  }
+  // Initially disable the Next Puzzle button
+  $(".buttonReset").prop("disabled", true);
+  $(".buttonSubmit").prop("disabled", false);
+}
+
+// Call the resetAndLoadImages function on page load
+resetAndLoadImages();
+
+// Call the resetAndLoadImages function when the reset button is clicked
+$(".buttonReset").click(function() {
+  resetAndLoadImages();
 });
-
+});
 const bar = document.querySelector(".bar");
