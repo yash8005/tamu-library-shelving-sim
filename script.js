@@ -96,7 +96,7 @@ var progress;
 // Execute when the document is ready
 $(document).ready(function () {
   console.log("Document ready");
-  $(".buttonRest").prop("disabled", true);
+  $(".buttonReset").prop("disabled", true);
   // Create a map to store directory and number of images
   const directoryImagesMap = new Map();
 
