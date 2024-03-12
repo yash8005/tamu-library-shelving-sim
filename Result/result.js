@@ -8,6 +8,8 @@ const multipleAttemptsCount = parseInt(
 const longestStreak = parseInt(localStorage.getItem("longestStreak"));
 const maxAttempts = parseInt(localStorage.getItem("maxAttempts"));
 
+const totalIncorrectAttemptsCount = parseInt(localStorage.getItem("totalIncorrectAttempts"));
+
 // Get references to the HTML elements where we want to display the data
 const accuracyElement = document.getElementById("accuracy");
 const multipleAttemptsCountElement =
@@ -26,9 +28,9 @@ const maxPossibleStreak = totalPuzzles; // Assuming all puzzles can be solved on
 
 const accuracyScore = (correctPuzzlesCount / totalPuzzles) * 100;
 const streakReward = (longestStreak / maxPossibleStreak) * 15; // Maximum reward of 20 points for a perfect streak
-const maxAttemptsPenalty = (maxAttempts / 5) * 10; // Maximum penalty of 10 points for all puzzles requiring multiple attempts
+const totalIncorrectAttemptsPenalty = (totalIncorrectAttemptsCount / 5) * 10; // Maximum penalty of 10 points for all puzzles requiring multiple attempts
 
-const totalScore = accuracyScore + streakReward - maxAttemptsPenalty;
+const totalScore = accuracyScore + streakReward - totalIncorrectAttemptsPenalty;
 const clampedScore = Math.max(0, Math.min(totalScore, 100)).toFixed(0); // Ensure the score is between 0 and 100
 
 // Render the analytics data
