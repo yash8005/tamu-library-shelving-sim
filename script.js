@@ -103,13 +103,29 @@ $(document).ready(function () {
   // Populate the map with directory and corresponding number of images
   directoryImagesMap.set("1", 3);
   directoryImagesMap.set("2", 3);
-  directoryImagesMap.set("3", 3);
+  directoryImagesMap.set("3", 5);
   directoryImagesMap.set("4", 7);
   directoryImagesMap.set("5", 5);
   directoryImagesMap.set("6", 7);
   directoryImagesMap.set("7", 5);
   directoryImagesMap.set("8", 7);
   directoryImagesMap.set("9", 6);
+  directoryImagesMap.set("10", 5);
+  directoryImagesMap.set("11", 5);
+  directoryImagesMap.set("12", 5);
+  directoryImagesMap.set("13", 7);
+  directoryImagesMap.set("14", 5);
+  directoryImagesMap.set("15", 3);
+  directoryImagesMap.set("16", 3);
+  directoryImagesMap.set("17", 7);
+  directoryImagesMap.set("18", 5);
+  directoryImagesMap.set("19", 5);
+  directoryImagesMap.set("20", 3);
+  directoryImagesMap.set("21", 5);
+  directoryImagesMap.set("22", 5);
+  directoryImagesMap.set("23", 3);
+  directoryImagesMap.set("24", 5);
+  directoryImagesMap.set("25", 5);
 
   // Function to handle click on submit button
   $(".buttonSubmit").click(function () {
