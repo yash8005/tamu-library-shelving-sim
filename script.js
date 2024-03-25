@@ -120,7 +120,7 @@ var progress;
 
 // Execute when the document is ready
 $(document).ready(function () {
-  console.log("Document ready");
+  //console.log("Document ready");
   $(".buttonReset").prop("disabled", true);
   // Create a map to store directory and number of images
   const directoryImagesMap = new Map();
@@ -154,7 +154,7 @@ $(document).ready(function () {
 
   // Function to handle click on submit button
   $(".buttonSubmit").click(function () {
-    console.log("Button clicked");
+    //console.log("Button clicked");
 
     // Array to store IDs of images inside '.box' elements
     var divContents = [];
@@ -162,7 +162,7 @@ $(document).ready(function () {
       var imgId = $(this).find("img").attr("id");
       divContents.push(imgId);
     });
-    console.log("Div contents:", divContents);
+   //console.log("Div contents:", divContents);
 
     // Check if the IDs are in ascending order
     var isAscending = true;
