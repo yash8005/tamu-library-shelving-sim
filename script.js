@@ -35,13 +35,38 @@ function handleDrop(e) {
     e.stopPropagation(); // Prevents the browser from redirecting.
   }
 
-  // Swap HTML content between source and target elements
-  if (dragSrcEl != this) {
-    dragSrcEl.innerHTML = this.innerHTML;
-    this.innerHTML = e.dataTransfer.getData("text/html");
-  }
-
-  return false;
+   // Get the target element and its index
+   const targetEl = this;
+   const targetIndex = Array.from(targetEl.parentNode.children).indexOf(targetEl);
+ 
+   // Get the dragged element
+   const draggedEl = dragSrcEl;
+   const draggedIndex = Array.from(draggedEl.parentNode.children).indexOf(draggedEl);
+ 
+   // If the dragged element is being dropped in the same container
+   if (draggedEl.parentNode === targetEl.parentNode) {
+     // Move the dragged element to the target position
+     draggedEl.parentNode.insertBefore(draggedEl, targetIndex > draggedIndex ? targetEl.nextSibling : targetEl);
+   } else {
+     // Remove the dragged element from its current position
+     draggedEl.parentNode.removeChild(draggedEl);
+ 
+     // Insert the dragged element at the target position
+     if (targetIndex < targetEl.parentNode.children.length) {
+       targetEl.parentNode.insertBefore(draggedEl, targetEl);
+     } else {
+       targetEl.parentNode.appendChild(draggedEl);
+     }
+   }
+ 
+   // Update the order of the images
+   const images = Array.from(targetEl.parentNode.children).map(child => child.firstElementChild);
+   const imageIds = images.map(img => img.id);
+   images.forEach((img, index) => {
+     const originalId = imageIds[index];
+     img.id = originalId;
+   });
+   return false;
 }
 
 // Function to handle the end of a drag operation
@@ -95,7 +120,7 @@ var progress;
 
 // Execute when the document is ready
 $(document).ready(function () {
-  console.log("Document ready");
+  //console.log("Document ready");
   $(".buttonReset").prop("disabled", true);
   // Create a map to store directory and number of images
   const directoryImagesMap = new Map();
@@ -129,7 +154,7 @@ $(document).ready(function () {
 
   // Function to handle click on submit button
   $(".buttonSubmit").click(function () {
-    console.log("Button clicked");
+    //console.log("Button clicked");
 
     // Array to store IDs of images inside '.box' elements
     var divContents = [];
@@ -137,7 +162,7 @@ $(document).ready(function () {
       var imgId = $(this).find("img").attr("id");
       divContents.push(imgId);
     });
-    console.log("Div contents:", divContents);
+   //console.log("Div contents:", divContents);
 
     // Check if the IDs are in ascending order
     var isAscending = true;
@@ -174,7 +199,10 @@ $(document).ready(function () {
         localStorage.setItem("multipleAttemptsCount", multipleAttemptsCount);
         localStorage.setItem("longestStreak", longestStreak);
         localStorage.setItem("maxAttempts", maxAttempts);
-        localStorage.setItem("totalIncorrectAttempts",totalIncorrectAttemptsCount);
+        localStorage.setItem(
+          "totalIncorrectAttempts",
+          totalIncorrectAttemptsCount
+        );
 
         // Redirect to the results page
         window.location.href = "Result/result.html";
@@ -187,97 +215,94 @@ $(document).ready(function () {
     }
   });
 
- // Function to reset and load images
- function resetAndLoadImages() {
-  // Hide the result div
-  $(result).text("").css("background-color", "transparent");
+  // Function to reset and load images
+  function resetAndLoadImages() {
+    // Hide the result div
+    $(result).text("").css("background-color", "transparent");
 
-  $(".progress-bar-fill").css("width", progress + "%");
+    $(".progress-bar-fill").css("width", progress + "%");
 
-  // Function to get a random integer between min and max (inclusive)
-  function getRandomInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
+    // Function to get a random integer between min and max (inclusive)
+    function getRandomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
 
-  var path = "/Books/Sets"; // Path to the directory containing images
-  var totalDirectories = directoryImagesMap.size; // Total number of directories
+    var path = "/Books/Sets"; // Path to the directory containing images
+    var totalDirectories = directoryImagesMap.size; // Total number of directories
 
-  do {
-    randomDirectory = getRandomInt(1, totalDirectories);
-  } while (
-    solvedDirectoryIndices.has(randomDirectory) &&
-    solvedDirectoryIndices.size < totalDirectories
-  );
+    do {
+      randomDirectory = getRandomInt(1, totalDirectories);
+    } while (solvedDirectoryIndices.has(randomDirectory) && solvedDirectoryIndices.size < totalDirectories);
 
-  // If all directories have been solved correctly on the first attempt, reset the solvedDirectoryIndices set
-  if (solvedDirectoryIndices.size === totalDirectories) {
-    solvedDirectoryIndices.clear();
-  }
+    // If all directories have been solved correctly on the first attempt, reset the solvedDirectoryIndices set
+    if (solvedDirectoryIndices.size === totalDirectories) {
+      solvedDirectoryIndices.clear();
+    }
 
-  var numberOfImages = directoryImagesMap.get(String(randomDirectory));
+    var numberOfImages = directoryImagesMap.get(String(randomDirectory));
 
-  // Update the grid-template-columns property of the .container class using jQuery
-  $(".container").css(
-    "grid-template-columns",
-    `repeat(${numberOfImages}, 1fr)`,
-  );
-
-  // Remove existing box divs
-  $(".box").remove();
-
-  // Generate an array containing IDs of all images in the selected directory
-  var imageIds = [];
-  for (var i = 1; i <= numberOfImages; i++) {
-    imageIds.push(i);
-  }
-
-  // Shuffle the array to randomize the order of image IDs
-  for (var i = imageIds.length - 1; i > 0; i--) {
-    var j = Math.floor(Math.random() * (i + 1));
-    var temp = imageIds[i];
-    imageIds[i] = imageIds[j];
-    imageIds[j] = temp;
-  }
-
-  // Create new box divs and assign each image ID in the shuffled order
-  for (var i = 0; i < numberOfImages; i++) {
-    // Create new box divs and assign each image ID in the shuffled order
-    var newDiv = document.createElement("div");
-    newDiv.setAttribute("draggable", true);
-    newDiv.classList.add("box");
-    newDiv.setAttribute("id", "book-" + (i + 1));
-
-    var newImg = document.createElement("img");
-    newImg.setAttribute(
-      "src",
-      `${path}/${randomDirectory}/${imageIds[i]}.PNG`,
+    // Update the grid-template-columns property of the .container class using jQuery
+    $(".container").css(
+      "grid-template-columns",
+      `repeat(${numberOfImages}, 1fr)`
     );
-    newImg.setAttribute("id", imageIds[i]);
-    newImg.setAttribute("width", "120");
-    newImg.setAttribute("height", "550");
 
-    newDiv.appendChild(newImg);
-    $(".container").append(newDiv);
+    // Remove existing box divs
+    $(".box").remove();
 
-    // Attach event listeners for drag and drop operations to the new elements
-    newDiv.addEventListener("dragstart", handleDragStart);
-    newDiv.addEventListener("dragenter", handleDragEnter);
-    newDiv.addEventListener("dragover", handleDragOver);
-    newDiv.addEventListener("dragleave", handleDragLeave);
-    newDiv.addEventListener("drop", handleDrop);
-    newDiv.addEventListener("dragend", handleDragEnd);
+    // Generate an array containing IDs of all images in the selected directory
+    var imageIds = [];
+    for (var i = 1; i <= numberOfImages; i++) {
+      imageIds.push(i);
+    }
+
+    // Shuffle the array to randomize the order of image IDs
+    for (var i = imageIds.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var temp = imageIds[i];
+      imageIds[i] = imageIds[j];
+      imageIds[j] = temp;
+    }
+
+    // Create new box divs and assign each image ID in the shuffled order
+    for (var i = 0; i < numberOfImages; i++) {
+      // Create new box divs and assign each image ID in the shuffled order
+      var newDiv = document.createElement("div");
+      newDiv.setAttribute("draggable", true);
+      newDiv.classList.add("box");
+      newDiv.setAttribute("id", "book-" + (i + 1));
+
+      var newImg = document.createElement("img");
+      newImg.setAttribute(
+        "src",
+        `${path}/${randomDirectory}/${imageIds[i]}.PNG`
+      );
+      newImg.setAttribute("id", imageIds[i]);
+      newImg.setAttribute("width", "120");
+      newImg.setAttribute("height", "550");
+
+      newDiv.appendChild(newImg);
+      $(".container").append(newDiv);
+
+      // Attach event listeners for drag and drop operations to the new elements
+      newDiv.addEventListener("dragstart", handleDragStart);
+      newDiv.addEventListener("dragenter", handleDragEnter);
+      newDiv.addEventListener("dragover", handleDragOver);
+      newDiv.addEventListener("dragleave", handleDragLeave);
+      newDiv.addEventListener("drop", handleDrop);
+      newDiv.addEventListener("dragend", handleDragEnd);
+    }
+    // Initially disable the Next Puzzle button
+    $(".buttonReset").prop("disabled", true);
+    $(".buttonSubmit").prop("disabled", false);
   }
-  // Initially disable the Next Puzzle button
-  $(".buttonReset").prop("disabled", true);
-  $(".buttonSubmit").prop("disabled", false);
-}
 
-// Call the resetAndLoadImages function on page load
-resetAndLoadImages();
-
-// Call the resetAndLoadImages function when the reset button is clicked
-$(".buttonReset").click(function() {
+  // Call the resetAndLoadImages function on page load
   resetAndLoadImages();
-});
+
+  // Call the resetAndLoadImages function when the reset button is clicked
+  $(".buttonReset").click(function () {
+    resetAndLoadImages();
+  });
 });
 const bar = document.querySelector(".bar");
